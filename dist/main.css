@@ -1,0 +1,21 @@
+body {
+  background-color: #ff0;
+  color: #fff;
+}
+
+::-webkit-input-placeholder {
+  color: gray;
+}
+
+:-ms-input-placeholder,::-ms-input-placeholder {
+  color: gray;
+}
+
+::placeholder {
+  color: gray;
+}
+
+.flex {
+  display: flex;
+  color: blue;
+}

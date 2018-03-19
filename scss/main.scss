@@ -1,0 +1,18 @@
+$primary-color: yellow;
+body {
+    background-color: $primary-color;
+    color: white;
+}
+
+.red-text {
+    color: red;
+}
+
+::placeholder {
+    color: gray;
+}
+
+.flex {
+    display: flex;
+    color: blue;
+}
