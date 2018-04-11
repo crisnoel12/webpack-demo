@@ -1,13 +1,10 @@
 let webpack = require('webpack');
 let path = require('path');
 const glob = require('glob-all');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const PurifyCSSPlugin = require('purifycss-webpack');
-
-const extractSass = new ExtractTextPlugin({
-    filename: "[name].css",
-    disable: process.env.NODE_ENV === "development"
-});
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin"); // minify JS
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // extract css
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin"); // minify css
+const PurifyCSSPlugin = require('purifycss-webpack'); // remove unused css
 
 const purifyCss = new PurifyCSSPlugin({
     paths: glob.sync([
@@ -18,39 +15,39 @@ const purifyCss = new PurifyCSSPlugin({
 
 
 module.exports = {
-    entry: './js/main.js',
-    output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: 'bundle.js'
-    },
     module: {
         rules: [
             {
                 test: /\.scss$/,
-                use: extractSass.extract({
-                    use: [
+                use: [
+                        MiniCssExtractPlugin.loader,
                         { loader: "css-loader", options: { importLoaders: 1 }  }, 
                         { loader: "postcss-loader" }, 
                         { loader: "sass-loader" }
-                    ],
-                    // use style-loader in development
-                    fallback: "style-loader"
-                })
+                     ]
             },
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env']
-                    }
-                }
+                loader: 'babel-loader'
             }
         ]
     },
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true // set to true if you want JS source maps
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ]
+    },
     plugins: [
-        extractSass,
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+            chunkFilename: "[id].css"
+        }),
         purifyCss
     ]
 };
